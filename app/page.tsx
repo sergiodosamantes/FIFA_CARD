@@ -1,65 +1,68 @@
-import Image from "next/image";
+"use client";
+
+import React, { useRef } from 'react';
+import PlayerCard from '@/components/PlayerCard';
+import { Download } from 'lucide-react';
+import { toPng } from 'html-to-image';
 
 export default function Home() {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const downloadCard = async () => {
+    if (cardRef.current === null) return;
+    
+    try {
+      // Convertimos el div de la carta en una imagen PNG
+      const dataUrl = await toPng(cardRef.current, { 
+        cacheBust: true,
+        style: {
+          transform: 'scale(1)',
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `mi-carta-fifa.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Error al generar la imagen:', err);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-8">
+      
+      {/* Título */}
+      <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 mb-12 tracking-tight drop-shadow-lg text-center uppercase">
+        FIFA Squad Manager
+      </h1>
+
+      <div className="flex flex-col items-center gap-12">
+        
+        {/* Envolvemos la carta en el ref para poder descargarla */}
+        <div ref={cardRef}>
+          <PlayerCard 
+            name="Sergio"
+            position="MC"
+            overall={88}
+            pac={85}
+            sho={82}
+            pas={90}
+            dri={86}
+            def={70}
+            phy={78}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        {/* Botón de descarga con el evento onClick */}
+        <button 
+          onClick={downloadCard}
+          className="bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold py-4 px-10 rounded-full flex items-center gap-3 transition-all shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:shadow-[0_0_30px_rgba(234,179,8,0.6)] active:scale-95 uppercase tracking-wider"
+        >
+          <Download size={24} strokeWidth={3} />
+          Guardar Imagen
+        </button>
+      </div>
+    </main>
   );
 }
