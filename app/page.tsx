@@ -4,18 +4,19 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import PlayerCard from '@/components/PlayerCard';
 import { Loader2 } from 'lucide-react';
+// IMPORTANTE: Falta esta línea para que funcione la navegación
+import Link from 'next/link'; 
 
 export default function Home() {
   const [players, setPlayers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Traer todos los jugadores de la base de datos
   useEffect(() => {
     async function fetchPlayers() {
       const { data, error } = await supabase
         .from('players')
         .select('*')
-        .order('overall', { ascending: false }); // Los mejores primero
+        .order('overall', { ascending: false });
 
       if (data) setPlayers(data);
       setLoading(false);
@@ -38,15 +39,17 @@ export default function Home() {
         <p className="text-zinc-400 mt-2">Consulta tu progreso y descarga tu carta oficial</p>
       </header>
 
-      {/* Grid de Cartas para que "Juan" las vea todas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
         {players.map((p) => (
           <div key={p.id} className="flex flex-col items-center gap-4">
             <PlayerCard {...p} />
-            {/* Botón de descarga individual para cada carta */}
-            <button className="text-xs font-bold bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-full transition-colors">
-              DESCARGAR CARTA
-            </button>
+            {/* Ahora el link apunta a la ruta dinámica del jugador */}
+            <Link
+              href={`/player/${p.id}`}
+              className="text-xs font-bold bg-yellow-500 text-black px-6 py-2 rounded-full hover:bg-yellow-400 transition-colors uppercase tracking-widest shadow-lg shadow-yellow-500/20"
+            >
+              Ver y Descargar
+            </Link>
           </div>
         ))}
       </div>
